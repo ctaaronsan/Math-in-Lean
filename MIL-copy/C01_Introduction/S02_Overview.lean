@@ -19,15 +19,18 @@ def FermatLastTheorem :=
 #check FermatLastTheorem
 
 -- These are proofs of propositions.
-theorem easy : 2 + 2 = 4 :=
+theorem easy : 2 + 1 = 3 :=
   rfl
 
 #check easy
+#check rfl
 
 theorem hard : FermatLastTheorem :=
   sorry
 
 #check hard
+#print axioms easy
+#print axioms FermatLastTheorem
 
 -- Here are some proofs.
 example : ∀ m n : Nat, Even n → Even (m * n) := fun m n ⟨k, (hk : n = k + k)⟩ ↦
@@ -39,9 +42,9 @@ fun m n ⟨k, hk⟩ ↦ ⟨m * k, by rw [hk, mul_add]⟩
 
 example : ∀ m n : Nat, Even n → Even (m * n) := by
   -- Say `m` and `n` are natural numbers, and assume `n = 2 * k`.
-  rintro m n ⟨k, hk⟩
+  rintro l n ⟨k, hk⟩
   -- We need to prove `m * n` is twice a natural number. Let's show it's twice `m * k`.
-  use m * k
+  use l * k
   -- Substitute for `n`,
   rw [hk]
   -- and now it's obvious.
@@ -52,4 +55,3 @@ example : ∀ m n : Nat, Even n → Even (m * n) := by
 
 example : ∀ m n : Nat, Even n → Even (m * n) := by
   intros; simp [*, parity_simps]
-

@@ -5,6 +5,7 @@ import MIL.Common
 section
 variable (R : Type*) [Ring R]
 
+#check (add_assoc (G:=R))
 #check (add_assoc : ∀ a b c : R, a + b + c = a + (b + c))
 #check (add_comm : ∀ a b : R, a + b = b + a)
 #check (zero_add : ∀ a : R, 0 + a = a)
@@ -40,6 +41,9 @@ theorem add_zero (a : R) : a + 0 = a := by rw [add_comm, zero_add]
 
 theorem add_neg_cancel (a : R) : a + -a = 0 := by rw [add_comm, neg_add_cancel]
 
+#check (add_neg_cancel : (a : R) → a + -a = 0)
+#check (add_neg_cancel : ∀ a : R, a + -a = 0)
+#check add_neg_cancel
 #check MyRing.add_zero
 #check add_zero
 
@@ -53,34 +57,79 @@ theorem neg_add_cancel_left (a b : R) : -a + (a + b) = b := by
 
 -- Prove these:
 theorem add_neg_cancel_right (a b : R) : a + b + -b = a := by
-  sorry
+  rw [add_assoc, add_neg_cancel, add_zero]
 
 theorem add_left_cancel {a b c : R} (h : a + b = a + c) : b = c := by
-  sorry
+  rw [← neg_add_cancel_left a b, h, neg_add_cancel_left]
 
 theorem add_right_cancel {a b c : R} (h : a + b = c + b) : a = c := by
-  sorry
+  rw [← add_neg_cancel_right a b, h, add_neg_cancel_right]
+
+section
+variable (a b c : R)
+#check (add_left_cancel : a + b = a + c → b = c)
+end
+
+#check (add_left_cancel : (a b c : R) →  a + b = a + c → b = c)
 
 theorem mul_zero (a : R) : a * 0 = 0 := by
   have h : a * 0 + a * 0 = a * 0 + 0 := by
     rw [← mul_add, add_zero, add_zero]
-  rw [add_left_cancel h]
+  -- rw [add_left_cancel h]
+  exact add_left_cancel h
 
 theorem zero_mul (a : R) : 0 * a = 0 := by
-  sorry
+  have h : 0 * a + 0 * a = 0 + 0 * a := by
+    rw [← add_mul, zero_add, zero_add]
+  exact add_right_cancel h
+
 
 theorem neg_eq_of_add_eq_zero {a b : R} (h : a + b = 0) : -a = b := by
-  sorry
+  rw [← add_zero (-a), ← h, neg_add_cancel_left]
+
+-- other versions
+example {a b : R} (h : a + b = 0) : -a = b :=
+  calc
+    -a = -a + a + b := by
+      nth_rw 1 [← add_zero (-a)]
+      rw [add_assoc, h]
+    _ = b := by
+      rw [neg_add_cancel, zero_add]
+
+example {a b : R} (h : a + b = 0) : -a = b := by
+  rw [← neg_add_cancel a, add_comm (-a)] at h
+  rw [add_left_cancel h]
+
+example {a b : R} (h : a + b = 0) : -a = b := by
+  rw [← neg_add_cancel a, add_comm (-a)] at h
+  exact add_left_cancel h.symm
+
+example {a b : R} (h : a + b = 0) : -a = b := by
+  apply add_left_cancel (a := a)
+  rw [add_neg_cancel]
+  exact h.symm
+
+example {a b : R} (h : a + b = 0) : -a = b := by
+  have h' : a + -a = a + b := by
+    rw [add_neg_cancel]
+    exact h.symm
+  exact add_left_cancel h'
 
 theorem eq_neg_of_add_eq_zero {a b : R} (h : a + b = 0) : a = -b := by
-  sorry
+  rw [← neg_add_cancel b] at h
+  exact add_right_cancel h
 
 theorem neg_zero : (-0 : R) = 0 := by
   apply neg_eq_of_add_eq_zero
   rw [add_zero]
 
 theorem neg_neg (a : R) : - -a = a := by
-  sorry
+  apply neg_eq_of_add_eq_zero
+  rw [neg_add_cancel]
+
+example (a : R) : - -a = a := by
+  apply neg_eq_of_add_eq_zero
+  exact neg_add_cancel a
 
 end MyRing
 
@@ -103,7 +152,12 @@ namespace MyRing
 variable {R : Type*} [Ring R]
 
 theorem self_sub (a : R) : a - a = 0 := by
-  sorry
+  rw [sub_eq_add_neg]
+  exact add_neg_cancel a
+
+example (a : ℝ) : a - a = 0 := by
+  -- have h : a + -a = a - a := rfl
+  exact add_neg_cancel a
 
 theorem one_add_one_eq_two : 1 + 1 = (2 : R) := by
   norm_num
@@ -143,4 +197,3 @@ theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
 end MyGroup
 
 end
-
