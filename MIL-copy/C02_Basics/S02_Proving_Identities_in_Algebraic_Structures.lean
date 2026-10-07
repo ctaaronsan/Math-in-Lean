@@ -163,7 +163,7 @@ theorem one_add_one_eq_two : 1 + 1 = (2 : R) := by
   norm_num
 
 theorem two_mul (a : R) : 2 * a = a + a := by
-  sorry
+  rw [← one_add_one_eq_two, add_mul, one_mul]
 
 end MyRing
 
@@ -179,6 +179,7 @@ end
 section
 variable {G : Type*} [Group G]
 
+#check mul_assoc (G:=G)
 #check (mul_assoc : ∀ a b c : G, a * b * c = a * (b * c))
 #check (one_mul : ∀ a : G, 1 * a = a)
 #check (inv_mul_cancel : ∀ a : G, a⁻¹ * a = 1)
@@ -186,13 +187,22 @@ variable {G : Type*} [Group G]
 namespace MyGroup
 
 theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  rw [← one_mul (a * a⁻¹)]
+  nth_rw 1 [← inv_mul_cancel a⁻¹]
+  rw [← mul_assoc, mul_assoc a⁻¹⁻¹, inv_mul_cancel]
+  rw [mul_assoc, one_mul, inv_mul_cancel]
 
 theorem mul_one (a : G) : a * 1 = a := by
-  sorry
+  rw [← inv_mul_cancel a, ← mul_assoc, mul_inv_cancel, one_mul]
 
 theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+  have h1 : a * b * b⁻¹ * a⁻¹ = 1 := by
+    rw [mul_assoc a, mul_inv_cancel b, mul_one, mul_inv_cancel]
+  have h2 : (a * b)⁻¹ * (a * b * b⁻¹ * a⁻¹) = (a * b)⁻¹ := by
+    rw [h1, mul_one]
+  rw [← mul_assoc, ← mul_assoc] at h2
+  rw [inv_mul_cancel, one_mul] at h2
+  exact h2.symm
 
 end MyGroup
 
