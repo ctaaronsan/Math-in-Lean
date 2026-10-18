@@ -58,3 +58,12 @@ example : |a*b| ≤ (a^2 + b^2)/2 := by
   rw [le_div_iff₀ h]
   apply fact2
 
+example : |a*b| ≤ (a^2 + b^2)/2 := by
+  apply abs_le'.mpr
+  constructor
+  · linarith [fact1 a b]
+  · linarith [fact2 a b]
+
+#check (fact1)
+#check fact1
+#print fact1
