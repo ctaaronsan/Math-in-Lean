@@ -89,7 +89,7 @@ example : min (min a b) c = min a (min b c) := by
     · show  min (min a b) c ≤ min b c
       apply le_min
       · exact le_trans (min_le_left _ _) (min_le_right _ _)
-      · exact min_le_right _ _
+      · apply min_le_right
   have h_ge : min (min a b) c ≥ min a (min b c) := by
     rw [min_symm, min_symm a b, min_symm a, min_symm b c]
     apply h_le
@@ -113,7 +113,7 @@ theorem aux : min a b + c ≤ min (a + c) (b + c) := by
 
 example : min a b + c = min (a + c) (b + c) := by
   apply le_antisymm
-  · exact aux _ _ _
+  · apply aux
   · show min (a + c) (b + c) ≤ min a b + c
     rw [← add_neg_cancel_right (min _ _) (-c), neg_neg]
     apply add_le_add_left
@@ -123,7 +123,7 @@ example : min a b + c = min (a + c) (b + c) := by
 -- better
 example : min a b + c = min (a + c) (b + c) := by
   apply le_antisymm
-  · exact aux a b c
+  · apply aux
   · show min (a + c) (b + c) ≤ min a b + c
     have h : min (a + c) (b + c) - c ≤ min a b
     calc
