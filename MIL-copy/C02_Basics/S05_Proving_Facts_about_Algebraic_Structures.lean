@@ -108,14 +108,9 @@ example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = x ⊓ y ⊔ x ⊓ z) : a ⊔ b �
   rw [inf_comm c a, sup_inf_self, inf_comm]
 
 example (h : ∀ x y z : α, x ⊔ y ⊓ z = (x ⊔ y) ⊓ (x ⊔ z)) : a ⊓ (b ⊔ c) = a ⊓ b ⊔ a ⊓ c := by
-  rw []
-  -- · show a ⊓ b ⊔ a ⊓ c ≤ a ⊓ (b ⊔ c)
-  --   apply sup_le
-  --   · apply inf_le_inf_left
-  --     apply le_sup_left
-  --   · apply inf_le_inf_left
-  --     apply le_sup_right
-
+  rw [h, sup_comm (a ⊓ b), sup_inf_self]
+  rw [sup_comm (a ⊓ b), h, ← inf_assoc]
+  rw [sup_comm c a, inf_sup_self, sup_comm]
 
 end
 
