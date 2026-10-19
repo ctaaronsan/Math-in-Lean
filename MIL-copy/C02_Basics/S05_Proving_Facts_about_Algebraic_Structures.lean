@@ -123,15 +123,26 @@ variable (a b c : R)
 
 #check (mul_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a * b)
 
-example (h : a ≤ b) : 0 ≤ b - a := by
-  sorry
+theorem fact1 {a b : R} (h : a ≤ b) : 0 ≤ b - a := by
+  rw [← add_neg_cancel a, sub_eq_add_neg,
+    add_comm a (-a), add_comm b (-a)]
+  apply add_le_add_right
+  exact h
+#check (fact1 : a ≤ b → 0 ≤ b - a)
 
-example (h: 0 ≤ b - a) : a ≤ b := by
-  sorry
+theorem fact2 {a b : R} (h: 0 ≤ b - a) : a ≤ b :=
+  calc a = a + 0 := (add_zero a).symm
+    _ ≤ a + (b - a) := by
+      apply add_le_add_right h
+    _ = b := by
+      rw [add_sub_cancel]
 
 example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c := by
-  sorry
-
+  apply fact2
+  rw [← sub_mul]
+  apply mul_nonneg
+  · apply fact1 h
+  exact h'
 end
 
 section
@@ -143,6 +154,11 @@ variable (x y z : X)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
 
 example (x y : X) : 0 ≤ dist x y := by
-  sorry
+  have h : 0 ≤ 2 * dist x y :=
+  calc 0 = dist x x := (dist_self x).symm
+    _ ≤ dist x y + dist y x := dist_triangle x y x
+    _ = 2 * dist x y := by
+      rw [dist_comm, two_mul]
+  linarith
 
 end
