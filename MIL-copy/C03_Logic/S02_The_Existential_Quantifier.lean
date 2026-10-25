@@ -12,7 +12,8 @@ example : ∃ x : ℝ, 2 < x ∧ x < 3 := by
 example : ∃ x : ℝ, 2 < x ∧ x < 3 := by
   have h1 : 2 < (5 : ℝ) / 2 := by norm_num
   have h2 : (5 : ℝ) / 2 < 3 := by norm_num
-  use 5 / 2, h1, h2
+  -- use 5 / 2, h1, h2
+  use 5 / 2
 
 example : ∃ x : ℝ, 2 < x ∧ x < 3 := by
   have h : 2 < (5 : ℝ) / 2 ∧ (5 : ℝ) / 2 < 3 := by norm_num
@@ -41,6 +42,13 @@ theorem fnUb_add {f g : ℝ → ℝ} {a b : ℝ} (hfa : FnUb f a) (hgb : FnUb g 
     FnUb (fun x ↦ f x + g x) (a + b) :=
   fun x ↦ add_le_add (hfa x) (hgb x)
 
+theorem fnLb_add (hfa : FnLb f a) (hgb : FnLb g b) : FnLb (fun x ↦ f x + g x) (a + b) := by
+  intro x
+  change a + b ≤ f x + g x
+  apply add_le_add
+  apply hfa
+  apply hgb
+
 section
 
 variable {f g : ℝ → ℝ}
@@ -52,10 +60,24 @@ example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x ↦ f x + g x := by
   apply fnUb_add ubfa ubgb
 
 example (lbf : FnHasLb f) (lbg : FnHasLb g) : FnHasLb fun x ↦ f x + g x := by
-  sorry
+  rcases lbf with ⟨a, hlf⟩
+  rcases lbg with ⟨b, hlg⟩
+  use a + b
+  apply fnLb_add hlf hlg
 
 example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
-  sorry
+  rcases ubf with ⟨a, ubfa⟩
+  use c * a
+  intro x
+  exact mul_le_mul_of_nonneg_left (ubfa x) h
+
+example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
+  rcases ubf with ⟨a, ubfa⟩
+  use c * a
+  intro x
+  apply mul_le_mul_of_nonneg_left
+  apply ubfa
+  exact h
 
 example : FnHasUb f → FnHasUb g → FnHasUb fun x ↦ f x + g x := by
   rintro ⟨a, ubfa⟩ ⟨b, ubgb⟩
