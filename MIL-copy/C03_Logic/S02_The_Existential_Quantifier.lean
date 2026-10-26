@@ -80,6 +80,8 @@ example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x :=
   exact h
 
 example : FnHasUb f → FnHasUb g → FnHasUb fun x ↦ f x + g x := by
+  -- intro ⟨a, ubfa⟩
+  -- intro ⟨b, ubgb⟩
   rintro ⟨a, ubfa⟩ ⟨b, ubgb⟩
   exact ⟨a + b, fnUb_add ubfa ubgb⟩
 
@@ -150,8 +152,17 @@ example (divab : a ∣ b) (divbc : b ∣ c) : a ∣ c := by
   rw [ceq, beq]
   use d * e; ring
 
+example (divab : a ∣ b) (divbc : b ∣ c) : a ∣ c := by
+  rcases divab with ⟨d, rfl⟩
+  rcases divbc with ⟨e, rfl⟩
+  use d * e
+  ring
+
 example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
-  sorry
+  rcases divab with ⟨d, rfl⟩
+  rcases divac with ⟨e, rfl⟩
+  use d + e
+  ring
 
 end
 
@@ -164,12 +175,22 @@ example {c : ℝ} : Surjective fun x ↦ x + c := by
   use y - c
   dsimp; ring
 
+#check mul_div_cancel₀
+
 example {c : ℝ} (h : c ≠ 0) : Surjective fun x ↦ c * x := by
-  sorry
+  intro y
+  dsimp
+  use y / c
+  field_simp
+  -- exact mul_div_cancel₀ y h
 
 example (x y : ℝ) (h : x - y ≠ 0) : (x ^ 2 - y ^ 2) / (x - y) = x + y := by
   field_simp [h]
   ring
+
+#check Surjective
+#print Surjective
+#reduce Surjective
 
 example {f : ℝ → ℝ} (h : Surjective f) : ∃ x, f x ^ 2 = 4 := by
   rcases h 2 with ⟨x, hx⟩
@@ -181,10 +202,13 @@ end
 
 section
 open Function
-variable {α : Type*} {β : Type*} {γ : Type*}
+variable {α β γ : Type*}
 variable {g : β → γ} {f : α → β}
 
 example (surjg : Surjective g) (surjf : Surjective f) : Surjective fun x ↦ g (f x) := by
-  sorry
-
+  intro z
+  dsimp
+  rcases surjg z with ⟨y, rfl⟩
+  rcases surjf y with ⟨x, rfl⟩
+  use x
 end
