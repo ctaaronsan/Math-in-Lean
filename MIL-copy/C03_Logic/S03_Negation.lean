@@ -23,6 +23,9 @@ def FnHasUb (f : ℝ → ℝ) :=
 def FnHasLb (f : ℝ → ℝ) :=
   ∃ a, FnLb f a
 
+#print FnHasUb
+#print FnUb
+
 variable (f : ℝ → ℝ)
 
 example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
@@ -136,4 +139,3 @@ example (h : 0 < 0) : a > 37 := by
   contradiction
 
 end
-
